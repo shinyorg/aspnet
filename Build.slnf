@@ -1,0 +1,8 @@
+{
+    "solution": {
+        "path": "AspNet.slnx",
+        "projects": [
+            "src\\Shiny.AspNet.WebHosting\\Shiny.AspNet.WebHosting.csproj"
+        ]
+    }
+}

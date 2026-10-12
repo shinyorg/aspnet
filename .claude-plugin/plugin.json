@@ -1,0 +1,21 @@
+{
+  "name": "shiny-aspnet",
+  "version": "1.0.0",
+  "description": "Claude Code plugin for Shiny AspNet - ASP.NET Core infrastructure modules for .NET applications",
+  "author": {
+    "name": "Shiny",
+    "email": "hello@shinylib.net",
+    "url": "https://shinylib.net"
+  },
+  "homepage": "https://shinylib.net",
+  "repository": "https://github.com/shinyorg/aspnet",
+  "license": "MIT",
+  "keywords": [
+    "aspnet",
+    "aspnetcore",
+    "infrastructure-modules",
+    "dotnet",
+    "aot"
+  ],
+  "skills": "./skills/"
+}

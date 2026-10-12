@@ -1,0 +1,14 @@
+{
+  "name": "shiny-plugins",
+  "owner": {
+    "name": "Shiny",
+    "email": "hello@shinylib.net"
+  },
+  "plugins": [
+    {
+      "name": "shiny-aspnet",
+      "source": "./",
+      "description": "Claude Code plugin for Shiny AspNet - ASP.NET Core infrastructure modules"
+    }
+  ]
+}

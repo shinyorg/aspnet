@@ -1,0 +1,8 @@
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
+    </ItemGroup>
+</Project>

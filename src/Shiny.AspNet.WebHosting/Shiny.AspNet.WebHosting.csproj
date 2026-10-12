@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Web hosting module infrastructure for ASP.NET Core applications</Description>
+        <PackageTags>shiny webhosting aspnetcore module</PackageTags>
+        <RootNamespace>Shiny</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="build\Shiny.AspNet.WebHosting.props"
+              PackagePath="build\Shiny.AspNet.WebHosting.props"
+              Pack="true"/>
+
+        <None Include="build\Shiny.AspNet.WebHosting.props"
+              PackagePath="buildTransitive\Shiny.AspNet.WebHosting.props"
+              Pack="true"/>
+    </ItemGroup>
+</Project>
