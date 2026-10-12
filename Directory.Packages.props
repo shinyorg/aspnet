@@ -3,7 +3,7 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
     <ItemGroup>
-        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50"/>
+        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.91"/>
     </ItemGroup>
     <ItemGroup>
         <!-- The NuGet feed's version rules. Deliberately only this one of NuGet's client packages:

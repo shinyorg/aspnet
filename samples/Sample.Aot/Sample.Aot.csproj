@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <!--
+        Exists to be published, not run: `dotnet publish -r <rid>` with PublishAot makes the trimmer and
+        the AOT compiler walk every library through a real call path. A library can be analyzer-clean on
+        its own (IsAotCompatible) and still warn once an app actually reaches it — this is where that
+        shows up, and CI fails the build on any warning.
+    -->
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <PublishAot>true</PublishAot>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Acme\Shiny.AspNet.Acme.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.CalDav\Shiny.AspNet.CalDav.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.ContentDigest\Shiny.AspNet.ContentDigest.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Discovery\Shiny.AspNet.Discovery.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.DocumentDb\Shiny.AspNet.DocumentDb.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.FileSync\Shiny.AspNet.FileSync.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Idempotency\Shiny.AspNet.Idempotency.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.JsonPatch\Shiny.AspNet.JsonPatch.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Npm\Shiny.AspNet.Npm.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.NuGet\Shiny.AspNet.NuGet.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Ssh\Shiny.AspNet.Ssh.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Tunnels\Shiny.AspNet.Tunnels.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Tus\Shiny.AspNet.Tus.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.WebDav\Shiny.AspNet.WebDav.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Webhooks\Shiny.AspNet.Webhooks.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.AspNet.WebHosting\Shiny.AspNet.WebHosting.csproj" />
+    </ItemGroup>
+
+    <Import Project="../../src/Shiny.AspNet.WebHosting/build/Shiny.AspNet.WebHosting.props" />
+</Project>

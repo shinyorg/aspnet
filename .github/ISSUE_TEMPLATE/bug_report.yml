@@ -3,6 +3,51 @@ description: You have found something wrong with Shiny AspNet
 title: "[Bug]: "
 labels: [bug, unverified]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for filing an issue.  Please only file issues against the LATEST STABLE or LATEST BETA version of Shiny AspNet from Nuget (ALPHAs are not accepted for issues).
+        If you have questions, please post them in GitHub discussions.
+        Documentation is at https://shinylib.net/aspnet
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      description: The package you are filing against.  If it is not listed here it means there is no support for it.
+      options:
+        - Shiny.AspNet.WebHosting
+        - Shiny.AspNet.WebDav
+        - Shiny.AspNet.CalDav
+        - Shiny.AspNet.Tus
+        - Shiny.AspNet.FileSync
+        - Shiny.AspNet.NuGet
+        - Shiny.AspNet.Npm
+        - Shiny.AspNet.DocumentDb
+        - Shiny.AspNet.JsonPatch
+        - Shiny.AspNet.Webhooks
+        - Shiny.AspNet.Idempotency
+        - Shiny.AspNet.ContentDigest
+        - Shiny.AspNet.Acme
+        - Shiny.AspNet.Discovery
+        - Shiny.AspNet.Ssh
+        - Shiny.AspNet.Tunnels
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Shiny AspNet Version
+      description: The version of the Nuget package you are filing against.
+    validations:
+      required: true
+  - type: input
+    id: dotnet
+    attributes:
+      label: .NET / Runtime Version
+      description: e.g. net10.0, the ASP.NET Core version, the OS, and whether you are running Native AOT / trimming.
+    validations:
+      required: true
   - type: textarea
     validations:
       required: true
@@ -27,9 +72,9 @@ body:
     id: exception
     attributes:
       label: Exception or Log output
-      description: Please copy and paste any relevant log output
+      description: Please copy and paste any relevant log output.
   - type: textarea
     id: codesample
     attributes:
       label: Code Sample
-      description: Please include a github repo with your reproducible sample
+      description: Please include a github repo with your reproducible sample.

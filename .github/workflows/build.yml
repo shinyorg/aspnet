@@ -10,44 +10,86 @@ on:
   push:
     branches:
     - main
-    - dev
-    - preview
     - v*
-    
+    paths-ignore:
+      - '.claude-plugin/**'
+      - 'skills/**'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
+    # Nerdbank.GitVersioning appends Git*Version lines to $GITHUB_ENV once per project. With parallel
+    # MSBuild (-m) the worker processes race on that file and tear lines, which the runner then rejects
+    # with "Invalid format '1.0.0'" at the end of the step. Nothing here consumes those variables.
+    #
+    # PublicRelease applies to every step, not just Build: the Test and AOT publish steps rebuild the
+    # src projects, and GeneratePackageOnBuild would otherwise emit a second, non-public
+    # (1.x.y-g<commit>) .nupkg next to the real one, which the push glob then publishes too.
+    env:
+      NBGV_SetCloudBuildVersionVars: false
+      PublicRelease: true
+
     permissions:
       id-token: write   # required for NuGet trusted publishing (OIDC)
       contents: read
 
-    runs-on: windows-latest
+    # macOS for the same reasons the suite is developed there: the SSH end-to-end tests drive a real
+    # unprivileged sshd, the tunnel-agent tests run stub shell scripts, and the AOT step below
+    # publishes for osx-arm64. On Windows the first two skip themselves rather than run.
+    runs-on: macos-26
 
     steps:
     - name: Checkout
       uses: actions/checkout@v7
       with:
-          fetch-depth: 0
+          fetch-depth: 0   # nbgv computes {height} from full history
 
     - name: Setup .NET 10.0
       uses: actions/setup-dotnet@v6
       with:
           dotnet-version: '10.0.x'
-        
-    - name: Build
-      run: dotnet build Build.slnf /restore -m -property:Configuration=Release -property:PublicRelease=true
 
+    - name: Build
+      run: dotnet build Build.slnf /restore -m -property:Configuration=Release
+
+    # No --no-build: Build.slnf deliberately excludes the test projects, so the previous step never
+    # produced their output. xunit v3 runs on Microsoft.Testing.Platform, so trx comes from
+    # --report-trx (the VSTest "--logger trx" spelling is silently ignored here), one file per test
+    # project under its own TestResults. TestingPlatformShowTestsFailure surfaces the failing test
+    # name, assertion and stack as MSBuild errors; without it the run reports only a count and points
+    # at a log file that lives on the runner, which makes a CI-only failure impossible to diagnose.
     - name: Test
-      run: dotnet test AspNet.slnx -c Release --nologo
+      run: dotnet test AspNet.slnx --configuration Release -p:TestingPlatformShowTestsFailure=true -p:TestingPlatformCaptureOutput=false -- --report-trx --report-trx-filename test-results.trx
+
+    # always(): the point of these is the run where the Test step failed.
+    - name: Post Test Results
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-results
+        path: |
+          tests/**/TestResults/*.trx
+          tests/**/TestResults/*.log
+        retention-days: 5
+        if-no-files-found: warn
+
+    # Every library reached through a real app, compiled ahead of time with warnings as errors. A
+    # library can pass its own trim/AOT analyzers and still warn once an app reaches it - this is
+    # where that shows up.
+    - name: Verify Native AOT
+      run: dotnet publish samples/Sample.Aot/Sample.Aot.csproj -r osx-arm64 --configuration Release
 
     - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v7
       with:
         name: nuget-artifacts
-        path: '**/*.nupkg'
+        path: |
+          **/*.nupkg
+          **/*.snupkg
+        retention-days: 5
 
     - name: NuGet Login (OIDC)
       id: nuget-login
@@ -56,6 +98,7 @@ jobs:
       with:
         user: aritchie
 
+    # Pushing a .nupkg also pushes the .snupkg that sits next to it.
     - name: Publish NuGets
       if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/v') }}
-      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate

@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>$(BaseTargetFramework)</TargetFramework>
         <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <IsAotCompatible>false</IsAotCompatible>
     </PropertyGroup>
 
