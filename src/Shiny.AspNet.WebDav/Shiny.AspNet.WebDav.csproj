@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.WebDav</RootNamespace>
+        <Description>A WebDAV (RFC 4918) class 1 and 2 server for ASP.NET Core - mount a directory in Finder, Windows Explorer or any WebDAV client. XML is read and written with XmlReader/XmlWriter, so the whole path is trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore webdav rfc4918 dav</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.WebDav.Tests"/>
+    </ItemGroup>
+</Project>

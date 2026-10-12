@@ -15,6 +15,7 @@ Guidance for Claude Code when working in this repository.
 
 - `src/` — shipping libraries
 - `samples/` — runnable samples (`Sample.Web`)
+- `src/Shared/` — internal source linked into more than one package (`<Compile Include="..\Shared\..." Link=...>`)
 - `skills/` — Claude Code skills shipped by this repo's plugin (`.claude-plugin/`)
 - `readme.md` — the NuGet/GitHub readme (also packed via `PackageReadmeFile`)
 
@@ -56,6 +57,24 @@ emulating the httpserver API.
 | `src/` project | Docs area (`~/Desktop/dev/documentation/src/content/docs/`) | Skill (`skills/`) |
 | --- | --- | --- |
 | `Shiny.AspNet.WebHosting` | `webhost/` | `shiny-web-hosting` |
+| `Shiny.AspNet.WebDav` | `aspnet/webdav.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.CalDav` | `aspnet/caldav.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Tus` | `aspnet/tus.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.FileSync` | `aspnet/filesync.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.NuGet` | `aspnet/nuget.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Npm` | `aspnet/npm.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.DocumentDb` | `aspnet/documentdb.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.JsonPatch` | `aspnet/json-patch.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Webhooks` | `aspnet/webhooks.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Idempotency` | `aspnet/idempotency.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.ContentDigest` | `aspnet/content-digest.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Acme` | `aspnet/acme.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Discovery` | `aspnet/discovery.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Ssh` | `aspnet/ssh.mdx` | `shiny-aspnet` |
+| `Shiny.AspNet.Tunnels` | `aspnet/tunnel-agents.mdx` | `shiny-aspnet` |
+
+All `aspnet/` pages share one release-notes file, `aspnet/release-notes.mdx`, and the landing page `aspnet/index.mdx`
+lists every package — add a row there for a new library.
 
 The docs live in an Astro/Starlight site at `~/Desktop/dev/documentation` (source, not the built `shinyorg.github.io`). The sidebar/menu is defined in `~/Desktop/dev/documentation/src/sidebar-topics.mjs`.
 

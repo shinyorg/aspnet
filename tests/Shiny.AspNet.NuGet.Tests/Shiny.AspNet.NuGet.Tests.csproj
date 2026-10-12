@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.NuGet\Shiny.AspNet.NuGet.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NuGet.Protocol" />
+    </ItemGroup>
+</Project>

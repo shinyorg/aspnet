@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.CalDav</RootNamespace>
+        <Description>CalDAV (RFC 4791) and CardDAV (RFC 6352) for ASP.NET Core - serve calendars and contacts to iOS and macOS Calendar and Contacts, Thunderbird and DAVx5. Discovery, sync-collection, calendar and address book queries with recurrence-aware time ranges, and minimal iCalendar and vCard parsers; trim- and AOT-clean throughout.</Description>
+        <PackageTags>shiny aspnetcore caldav carddav webdav rfc4791 rfc6352 icalendar vcard calendar contacts</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <!-- Built on the WebDAV package rather than beside it: the property names, the dead-property store
+         and the exception a store refuses with are the types a plain WebDAV mount uses, so an app that
+         serves both learns one vocabulary. -->
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.AspNet.WebDav\Shiny.AspNet.WebDav.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.CalDav.Tests"/>
+    </ItemGroup>
+</Project>

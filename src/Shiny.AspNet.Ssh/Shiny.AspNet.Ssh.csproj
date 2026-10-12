@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>SSH remote port forwarding for ASP.NET Core. Publishes a Kestrel app through any SSH endpoint you can log in to — a VPS you own, or a hosted tunnel like Pinggy or sish — with no inbound connectivity and no agent binary to install.</Description>
+        <PackageTags>shiny aspnetcore ssh tunnel port-forwarding pinggy sish</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="SSH.NET"/>
+        <InternalsVisibleTo Include="Shiny.AspNet.Ssh.Tests"/>
+        <Compile Include="..\Shared\LocalServerEndpoint.cs" Link="Internal\LocalServerEndpoint.cs"/>
+    </ItemGroup>
+</Project>

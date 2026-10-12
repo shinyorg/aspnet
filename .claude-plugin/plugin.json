@@ -1,7 +1,7 @@
 {
   "name": "shiny-aspnet",
   "version": "1.0.0",
-  "description": "Claude Code plugin for Shiny AspNet - ASP.NET Core infrastructure modules for .NET applications",
+  "description": "Claude Code plugin for Shiny AspNet - modular ASP.NET Core startup, WebDAV, CalDAV, tus, file sync, NuGet/npm feeds, JSON Patch, webhooks, idempotency, content digest, ACME TLS, mDNS discovery and tunnels",
   "author": {
     "name": "Shiny",
     "email": "hello@shinylib.net",
@@ -14,6 +14,18 @@
     "aspnet",
     "aspnetcore",
     "infrastructure-modules",
+    "webdav",
+    "caldav",
+    "tus",
+    "nuget-feed",
+    "npm-registry",
+    "json-patch",
+    "webhooks",
+    "idempotency",
+    "acme",
+    "letsencrypt",
+    "mdns",
+    "tunnels",
     "dotnet",
     "aot"
   ],

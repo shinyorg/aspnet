@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Agent-backed tunnels for ASP.NET Core — publishes a Kestrel app through cloudflared, ngrok or Tailscale Funnel by supervising the vendor's own agent process, forwarding to the address Kestrel actually bound.</Description>
+        <PackageTags>shiny aspnetcore tunnel cloudflared ngrok tailscale funnel</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <InternalsVisibleTo Include="Shiny.AspNet.Tunnels.Tests"/>
+        <Compile Include="..\Shared\LocalServerEndpoint.cs" Link="Internal\LocalServerEndpoint.cs"/>
+    </ItemGroup>
+</Project>

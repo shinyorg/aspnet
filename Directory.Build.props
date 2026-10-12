@@ -9,7 +9,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/shinyorg/aspnet</RepositoryUrl>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-        <NoWarn>$(NoWarn);CS1591</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
     </PropertyGroup>
 
     <!-- Enable trim/AOT analyzers on shipping library projects. Source generators (netstandard2.0) are excluded. -->

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>RFC 6902 JSON Patch for ASP.NET Core over System.Text.Json.Nodes — an RFC 6901 JSON Pointer, all-or-nothing apply, operation-indexed RFC 9457 problems with the RFC 5789 status for each failure, and a JsonPatchDocument that binds as a minimal-API parameter. No reflection: trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore jsonpatch json-patch rfc6902 jsonpointer rfc6901 patch aot</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+</Project>

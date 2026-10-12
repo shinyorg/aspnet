@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Webhooks\Shiny.AspNet.Webhooks.csproj" />
+    </ItemGroup>
+</Project>

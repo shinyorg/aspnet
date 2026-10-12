@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.ContentDigest\Shiny.AspNet.ContentDigest.csproj" />
+    </ItemGroup>
+</Project>

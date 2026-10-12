@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.FileSync</RootNamespace>
+        <Description>Dropbox-style file sync for ASP.NET Core. Files are split into content-defined chunks and stored once by hash, so editing a large file moves only the chunks that changed, and a copy or an older version costs nothing to re-upload. Includes a change feed with long-poll, optimistic revisions for conflict detection, and resumable pack uploads over tus. Pair it with Shiny.Net.HttpServer.FileSync.Client. Trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore sync file-sync dropbox onedrive delta chunking dedup</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Packs of chunks arrive over tus, so a phone that loses signal part way through an upload
+             resumes it instead of starting the pack again. -->
+        <ProjectReference Include="..\Shiny.AspNet.Tus\Shiny.AspNet.Tus.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.FileSync.Tests"/>
+    </ItemGroup>
+
+</Project>

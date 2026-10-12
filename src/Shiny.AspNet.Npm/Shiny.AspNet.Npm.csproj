@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.Npm</RootNamespace>
+        <Description>A private npm registry for ASP.NET Core - the registry API npm, pnpm and Yarn speak: install (full and abbreviated metadata), publish, dist-tags, deprecate, unpublish, owners, search, whoami and login, with an optional fall-through to registry.npmjs.org for everything that is not yours. No database, no Node.js, and trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore npm registry private-registry verdaccio javascript</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.Npm.Tests"/>
+    </ItemGroup>
+</Project>

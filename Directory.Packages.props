@@ -22,5 +22,8 @@
         <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.10"/>
         <PackageVersion Include="NuGet.Protocol" Version="7.9.0"/>
         <PackageVersion Include="Shiny.DocumentDb.Sqlite" Version="14.0.0"/>
+        <!-- Pinned past the version Shiny.DocumentDb.Sqlite brings (2.1.11, GHSA-2m69-gcr7-jv3q). Test-only. -->
+        <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13"/>
+        <PackageVersion Include="Shiny.Net.HttpServer.FileSync.Client" Version="2.1.1"/>
     </ItemGroup>
 </Project>

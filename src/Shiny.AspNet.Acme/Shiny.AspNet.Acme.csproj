@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>Automatic TLS certificates for ASP.NET Core and Kestrel from Let's Encrypt, ZeroSSL or any ACME (RFC 8555) CA — issued, stored, renewed and hot-swapped into the running server, with HTTP-01 and TLS-ALPN-01 answered by the app itself. Built on in-box cryptography only: no BouncyCastle, no Certes, and trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore kestrel acme letsencrypt zerossl tls certificates rfc8555</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.Acme.Tests"/>
+    </ItemGroup>
+</Project>

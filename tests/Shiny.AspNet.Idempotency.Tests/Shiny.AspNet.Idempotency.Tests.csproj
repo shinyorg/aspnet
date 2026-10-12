@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Idempotency\Shiny.AspNet.Idempotency.csproj" />
+    </ItemGroup>
+</Project>

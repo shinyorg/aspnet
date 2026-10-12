@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Ssh\Shiny.AspNet.Ssh.csproj" />
+    </ItemGroup>
+</Project>

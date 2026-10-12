@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>REST and live-query (SSE) endpoints for Shiny.DocumentDb on ASP.NET Core — a document type as a complete HTTP resource in one line: list, by-id, count, create, replace, merge patch and JSON Patch, delete and a Server-Sent Events tail, with ETags, request scopes and a field allowlist. Plain JSON, AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore documentdb rest sse server-sent-events jsonpatch merge-patch aot</PackageTags>
+    </PropertyGroup>
+
+    <!-- Analyzers on, like every other shipping project. The endpoints deliberately avoid the one
+         thing that would forfeit that: nothing here reflects over a handler's parameters, because
+         every route is mapped as a RequestDelegate that reads the context itself. -->
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <!-- The typed lane evaluates a request scope in memory with Shiny.DocumentDb's own interpreter —
+         the same one the query layer uses, so the HTTP layer and the query layer can never disagree
+         about what a scope means. That reaches us through the public Shiny.DocumentDb.Hosting surface
+         (DocumentPredicate / DocumentFilter / DocumentStoreAccessor), which is why this is an ordinary
+         PackageReference: the contract is versioned rather than silent, and the version floor is in
+         Directory.Packages.props. -->
+    <ItemGroup>
+        <PackageReference Include="Shiny.DocumentDb" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.AspNet.JsonPatch\Shiny.AspNet.JsonPatch.csproj" />
+    </ItemGroup>
+
+</Project>

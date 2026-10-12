@@ -1,0 +1,422 @@
+using System.Globalization;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Renci.SshNet;
+using Renci.SshNet.Common;
+
+namespace Shiny.AspNet.Ssh;
+
+/// <summary>
+/// One SSH connection carrying one remote forward — <c>ssh -R</c>, in library form — delivering
+/// what arrives to a local host and port, with reconnect, host key pinning and URL capture.
+/// <para>
+/// There is no listener of its own: Kestrel is the listener. SSH.NET forwards to a host:port, so the
+/// forward is pointed at the address Kestrel already bound, and connections arrive as ordinary
+/// loopback connections — the app never binds a port the internet can reach.
+/// </para>
+/// </summary>
+sealed class SshForwarder : IAsyncDisposable
+{
+    readonly SshTunnelOptions options;
+    readonly ILogger logger;
+    readonly string localHost;
+    readonly uint localPort;
+    readonly CancellationTokenSource stopping = new();
+
+    SshClient? client;
+    ForwardedPortRemote? forwardedPort;
+    ShellStream? session;
+    Task? supervisor;
+    int disposed;
+
+    public SshForwarder(SshTunnelOptions options, string localHost, int localPort, ILogger? logger = null)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentException.ThrowIfNullOrWhiteSpace(localHost);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(localPort);
+
+        this.options = options;
+        this.localHost = localHost;
+        this.localPort = (uint)localPort;
+        this.logger = logger ?? NullLogger.Instance;
+    }
+
+    /// <summary>
+    /// The address the world uses. Taken from <see cref="SshTunnelOptions.PublicUrl"/>, or the
+    /// banner when <see cref="SshTunnelOptions.CaptureUrlFromSession"/> is on, or derived from the
+    /// forwarded port.
+    /// </summary>
+    public string? PublicUrl
+    {
+        get => this.publicUrl;
+        private set
+        {
+            if (this.publicUrl == value)
+                return;
+
+            this.publicUrl = value;
+            this.PublicUrlChanged?.Invoke(this, value);
+        }
+    }
+
+    string? publicUrl;
+
+    /// <summary>The port the SSH server bound, which is only known after connecting if you asked for 0.</summary>
+    public int RemotePort { get; private set; }
+
+    /// <summary>True while the SSH connection is up. Goes false between drop and reconnect.</summary>
+    public bool IsConnected => this.client?.IsConnected ?? false;
+
+    /// <summary>Raised when the SSH connection drops or comes back, for surfacing status in a UI.</summary>
+    public event EventHandler<bool>? ConnectivityChanged;
+
+    /// <summary>
+    /// Raised when the public address changes.
+    /// <para>
+    /// Not a formality: a hosted tunnel assigns a fresh address on every reconnect, so an app that
+    /// captured the URL once and showed it in a UI would be displaying a dead link after the first
+    /// network change. Raised on a background thread — marshal before touching UI state.
+    /// </para>
+    /// </summary>
+    public event EventHandler<string?>? PublicUrlChanged;
+
+    /// <summary>
+    /// Connects and asks for the forward. Returns once the SSH server has accepted it, so a bad
+    /// key or a refused forward surfaces to the caller instead of faulting a task nobody awaits.
+    /// </summary>
+    public async Task ConnectAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(this.disposed != 0, this);
+
+        if (this.client is not null)
+            throw new InvalidOperationException("The tunnel is already connected.");
+
+        await this.ConnectOnceAsync(cancellationToken).ConfigureAwait(false);
+
+        if (this.options.AutoReconnect)
+            this.supervisor = Task.Run(() => this.SuperviseAsync(this.stopping.Token), CancellationToken.None);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref this.disposed, 1) != 0)
+            return;
+
+        if (!this.stopping.IsCancellationRequested)
+            await this.stopping.CancelAsync().ConfigureAwait(false);
+
+        if (this.supervisor is { } supervising)
+        {
+            try
+            {
+                await supervising.WaitAsync(TimeSpan.FromSeconds(5), CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+            {
+            }
+
+            this.supervisor = null;
+        }
+
+        this.Disconnect();
+        this.stopping.Dispose();
+    }
+
+    async Task ConnectOnceAsync(CancellationToken cancellationToken)
+    {
+        var connectionInfo = this.options.CreateConnectionInfo();
+        var sshClient = new SshClient(connectionInfo) { KeepAliveInterval = this.options.KeepAliveInterval };
+
+        sshClient.HostKeyReceived += this.OnHostKeyReceived;
+        sshClient.ErrorOccurred += this.OnErrorOccurred;
+
+        try
+        {
+            await sshClient.ConnectAsync(cancellationToken).ConfigureAwait(false);
+
+            var port = new ForwardedPortRemote(
+                this.options.RemoteBindAddress,
+                (uint)this.options.RemotePort,
+                this.localHost,
+                this.localPort
+            );
+
+            port.Exception += (_, e) => this.logger.LogWarning(e.Exception, "A forwarded connection failed");
+
+            sshClient.AddForwardedPort(port);
+
+            // Start() blocks until the server answers the forwarding request, and answers by
+            // closing the channel if it refuses — which is how a missing GatewayPorts or a
+            // permitopen restriction shows up.
+            await Task.Run(port.Start, cancellationToken).ConfigureAwait(false);
+
+            this.client = sshClient;
+            this.forwardedPort = port;
+            this.RemotePort = (int)port.BoundPort;
+
+            this.PublicUrl = this.options.PublicUrl
+                ?? (this.options.CaptureUrlFromSession
+                    ? await this.CaptureUrlAsync(sshClient, cancellationToken).ConfigureAwait(false)
+                    // Deriving the address is only honest for a forward whose public face you
+                    // already know. A hosted tunnel picks the address itself, so guessing one there
+                    // hands the app a link that cannot work — worse than admitting there isn't one.
+                    : this.DeriveUrl());
+
+            if (this.PublicUrl is null)
+                this.logger.LogWarning(
+                    "The forward to {RemoteBind}:{RemotePort} is up, but no public address is known. "
+                        + "Set {PublicUrl} if you know where this endpoint answers.",
+                    this.options.RemoteBindAddress,
+                    this.RemotePort,
+                    nameof(SshTunnelOptions.PublicUrl)
+                );
+            else
+                this.logger.LogInformation(
+                    "SSH tunnel up: {RemoteBind}:{RemotePort} -> {Local}, public at {Url}",
+                    this.options.RemoteBindAddress,
+                    this.RemotePort,
+                    $"{this.localHost}:{this.localPort}",
+                    this.PublicUrl
+                );
+
+            this.ConnectivityChanged?.Invoke(this, true);
+        }
+        catch
+        {
+            sshClient.HostKeyReceived -= this.OnHostKeyReceived;
+            sshClient.ErrorOccurred -= this.OnErrorOccurred;
+            sshClient.Dispose();
+
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Watches the SSH connection and rebuilds it after a drop.
+    /// <para>
+    /// Not optional: a network change or an SSH server restart kills the TCP connection under the
+    /// tunnel, and without this the app would look fine while being unreachable.
+    /// </para>
+    /// </summary>
+    async Task SuperviseAsync(CancellationToken cancellationToken)
+    {
+        var delay = this.options.ReconnectDelay;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken).ConfigureAwait(false);
+
+                if (this.client?.IsConnected == true)
+                {
+                    delay = this.options.ReconnectDelay;
+                    continue;
+                }
+
+                this.logger.LogWarning("The SSH tunnel dropped; reconnecting in {Delay}", delay);
+                this.ConnectivityChanged?.Invoke(this, false);
+
+                this.Disconnect();
+
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                await this.ConnectOnceAsync(cancellationToken).ConfigureAwait(false);
+
+                delay = this.options.ReconnectDelay;
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                // Back off rather than hammering a server that is down, or an auth failure that
+                // will fail identically every time.
+                delay = delay < this.options.MaxReconnectDelay
+                    ? TimeSpan.FromTicks(Math.Min(delay.Ticks * 2, this.options.MaxReconnectDelay.Ticks))
+                    : this.options.MaxReconnectDelay;
+
+                this.logger.LogWarning(ex, "Reconnecting the SSH tunnel failed; retrying in {Delay}", delay);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads the URL a hosted tunnel assigns.
+    /// <para>
+    /// sish, localhost.run and Serveo all print it on the session channel once forwarding is up,
+    /// and there is no other way to learn it — the address is chosen by the server. The channel
+    /// stays open afterwards, because some providers tear the forward down when it closes.
+    /// </para>
+    /// </summary>
+    async Task<string?> CaptureUrlAsync(SshClient sshClient, CancellationToken cancellationToken)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(this.options.UrlCaptureTimeout);
+
+        var capture = Task.Run(() => this.ReadUrlAsync(sshClient, timeout.Token), CancellationToken.None);
+
+        // Once abandoned below, nobody is left to await this — and a blocking SSH call that throws
+        // after that would surface as an unobserved exception rather than the warning it deserves.
+        _ = capture.ContinueWith(
+            static t => t.Exception,
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default
+        );
+
+        try
+        {
+            // The hard bound, and the reason the capture runs on its own task at all. Opening the
+            // session channel is a *blocking* call inside SSH.NET that waits for the server to
+            // confirm the shell request, and a server that never confirms one would otherwise hold
+            // ConnectAsync for the whole ConnectTimeout rather than UrlCaptureTimeout. Whatever
+            // happens in there, the caller gets an answer on schedule.
+            return await capture.WaitAsync(this.options.UrlCaptureTimeout, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is TimeoutException or OperationCanceledException)
+        {
+            // The abandoned read closes over its own stream and tidies up after itself; it is left
+            // running because some providers tear the forward down when the session channel closes.
+            this.logger.LogWarning(
+                "No URL appeared within {Timeout}. Some hosted endpoints — localhost.run among them — "
+                    + "never confirm the session request that carries it, in which case the address "
+                    + "cannot be read at all and {PublicUrl} has to be set explicitly.",
+                this.options.UrlCaptureTimeout,
+                nameof(SshTunnelOptions.PublicUrl)
+            );
+        }
+        catch (Exception ex) when (ex is ObjectDisposedException or SshException)
+        {
+            this.logger.LogWarning(ex, "Could not read the assigned URL from the session");
+        }
+
+        return null;
+    }
+
+    /// <summary>Opens the session channel and reads until the URL turns up or the token trips.</summary>
+    async Task<string?> ReadUrlAsync(SshClient sshClient, CancellationToken cancellationToken)
+    {
+        var shell = sshClient.CreateShellStreamNoTerminal(bufferSize: 4096);
+        this.session = shell;
+
+        var buffer = new byte[1024];
+        var text = new StringBuilder();
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var read = await shell.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            if (read == 0)
+                break;
+
+            text.Append(Encoding.UTF8.GetString(buffer, 0, read));
+
+            var match = this.options.UrlPattern.Match(text.ToString());
+            if (match.Success)
+            {
+                // A URL in prose brings the punctuation around it along: providers print theirs
+                // inside brackets, in quotes, or at the end of a sentence.
+                var url = match.Value.TrimEnd('.', ',', ';', ':', ')', ']', '}', '>', '"', '\'');
+                this.logger.LogInformation("The SSH endpoint assigned {Url}", url);
+
+                return url;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Best effort when nothing better is known: the forwarded port on the SSH host.
+    /// <para>
+    /// Right for a direct forward, wrong as soon as a reverse proxy terminates TLS in front of it —
+    /// which is why <see cref="SshTunnelOptions.PublicUrl"/> exists.
+    /// </para>
+    /// </summary>
+    string DeriveUrl() => string.Create(
+        CultureInfo.InvariantCulture,
+        $"http://{this.options.Host}:{this.RemotePort}"
+    );
+
+    void Disconnect()
+    {
+        var port = Interlocked.Exchange(ref this.forwardedPort, null);
+        var sshClient = Interlocked.Exchange(ref this.client, null);
+        var shell = Interlocked.Exchange(ref this.session, null);
+
+        try
+        {
+            shell?.Dispose();
+
+            if (port is not null)
+            {
+                if (port.IsStarted)
+                    port.Stop();
+
+                port.Dispose();
+            }
+
+            if (sshClient is not null)
+            {
+                sshClient.HostKeyReceived -= this.OnHostKeyReceived;
+                sshClient.ErrorOccurred -= this.OnErrorOccurred;
+                sshClient.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogDebug(ex, "Tearing down the SSH connection threw; it is going away regardless");
+        }
+    }
+
+    /// <summary>
+    /// Verifies the server's host key.
+    /// <para>
+    /// SSH.NET accepts any key unless told otherwise. An unverified key means anything on the path
+    /// can pose as the server, and a tunnel exists to cross networks you do not control — so an
+    /// unpinned connection is refused unless the caller has explicitly opted out.
+    /// </para>
+    /// </summary>
+    void OnHostKeyReceived(object? sender, HostKeyEventArgs e)
+    {
+        if (this.options.AcceptAnyHostKey)
+        {
+            this.logger.LogWarning(
+                "Accepting an unverified host key ({Fingerprint}). Pin it in HostKeyFingerprints.",
+                e.FingerPrintSHA256
+            );
+
+            e.CanTrust = true;
+            return;
+        }
+
+        // ssh-keygen prints "SHA256:…"; the SDK gives the bare base64. Accept either, and compare
+        // without the base64 padding some tools keep and others strip.
+        e.CanTrust = this.options.HostKeyFingerprints.Any(pinned => Matches(pinned, e.FingerPrintSHA256));
+
+        if (!e.CanTrust)
+            this.logger.LogError(
+                "Rejected the host key {Fingerprint}: it is not among the pinned fingerprints",
+                e.FingerPrintSHA256
+            );
+    }
+
+    internal static bool Matches(string pinned, string offered)
+    {
+        return Normalize(pinned).Equals(Normalize(offered), StringComparison.Ordinal);
+
+        static string Normalize(string fingerprint)
+        {
+            var value = fingerprint.Trim();
+
+            if (value.StartsWith("SHA256:", StringComparison.OrdinalIgnoreCase))
+                value = value["SHA256:".Length..];
+
+            return value.TrimEnd('=');
+        }
+    }
+
+    void OnErrorOccurred(object? sender, ExceptionEventArgs e) =>
+        this.logger.LogWarning(e.Exception, "The SSH connection reported an error");
+}

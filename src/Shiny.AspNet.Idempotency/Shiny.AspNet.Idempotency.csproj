@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.Idempotency</RootNamespace>
+        <Description>Idempotency-Key (draft-ietf-httpapi-idempotency-key-header) middleware for ASP.NET Core - a retried POST gets the stored original response instead of running twice. Per-endpoint opt-in, caller-scoped keys, 409 for in-flight duplicates, 422 for a reused key, and in-memory or IDistributedCache-backed stores.</Description>
+        <PackageTags>shiny aspnetcore idempotency idempotency-key retry middleware</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.Idempotency.Tests"/>
+    </ItemGroup>
+</Project>

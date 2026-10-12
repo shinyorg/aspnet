@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.Webhooks</RootNamespace>
+        <Description>Webhook signature verification and signing for ASP.NET Core - GitHub, Stripe, Slack, Standard Webhooks (Svix, Clerk, Resend, OpenAI) and any HMAC-in-a-header sender, verified over the exact bytes that arrived, with replay windows, secret rotation and duplicate-delivery suppression. Trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore webhooks hmac signature github stripe slack svix standard-webhooks</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.Webhooks.Tests"/>
+    </ItemGroup>
+</Project>

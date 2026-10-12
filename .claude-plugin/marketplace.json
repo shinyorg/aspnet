@@ -8,7 +8,7 @@
     {
       "name": "shiny-aspnet",
       "source": "./",
-      "description": "Claude Code plugin for Shiny AspNet - ASP.NET Core infrastructure modules"
+      "description": "Claude Code plugin for Shiny AspNet - ASP.NET Core libraries: modular startup, WebDAV/CalDAV, tus, file sync, NuGet/npm feeds, webhooks, idempotency, ACME TLS, discovery and tunnels"
     }
   ]
 }

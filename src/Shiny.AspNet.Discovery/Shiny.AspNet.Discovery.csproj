@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <Description>mDNS/DNS-SD (Bonjour) discovery for ASP.NET Core — advertises the app on the local link on the port Kestrel actually bound, and finds the servers other machines are advertising, so peers on a network can reach each other without anyone typing an IP address.</Description>
+        <PackageTags>shiny aspnetcore kestrel mdns dns-sd bonjour zeroconf discovery</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="Shiny.Net.Discovery"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.Discovery.Tests"/>
+    </ItemGroup>
+</Project>

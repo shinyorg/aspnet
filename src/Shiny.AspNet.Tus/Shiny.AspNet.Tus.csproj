@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.Tus</RootNamespace>
+        <Description>Resumable uploads for ASP.NET Core over the tus 1.0.0 protocol — a phone upload that drops half way resumes from the last byte the server kept instead of starting again. Speaks to tus-js-client, Uppy, TusDotNetClient and every other tus client. Bodies are streamed to the store, never buffered, and the whole path is trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore tus resumable upload</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.Tus.Tests"/>
+    </ItemGroup>
+
+</Project>

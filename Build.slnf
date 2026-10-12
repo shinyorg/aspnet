@@ -2,7 +2,22 @@
     "solution": {
         "path": "AspNet.slnx",
         "projects": [
-            "src\\Shiny.AspNet.WebHosting\\Shiny.AspNet.WebHosting.csproj"
+            "src\\Shiny.AspNet.Acme\\Shiny.AspNet.Acme.csproj",
+            "src\\Shiny.AspNet.CalDav\\Shiny.AspNet.CalDav.csproj",
+            "src\\Shiny.AspNet.ContentDigest\\Shiny.AspNet.ContentDigest.csproj",
+            "src\\Shiny.AspNet.Discovery\\Shiny.AspNet.Discovery.csproj",
+            "src\\Shiny.AspNet.DocumentDb\\Shiny.AspNet.DocumentDb.csproj",
+            "src\\Shiny.AspNet.FileSync\\Shiny.AspNet.FileSync.csproj",
+            "src\\Shiny.AspNet.Idempotency\\Shiny.AspNet.Idempotency.csproj",
+            "src\\Shiny.AspNet.JsonPatch\\Shiny.AspNet.JsonPatch.csproj",
+            "src\\Shiny.AspNet.Npm\\Shiny.AspNet.Npm.csproj",
+            "src\\Shiny.AspNet.NuGet\\Shiny.AspNet.NuGet.csproj",
+            "src\\Shiny.AspNet.Ssh\\Shiny.AspNet.Ssh.csproj",
+            "src\\Shiny.AspNet.Tunnels\\Shiny.AspNet.Tunnels.csproj",
+            "src\\Shiny.AspNet.Tus\\Shiny.AspNet.Tus.csproj",
+            "src\\Shiny.AspNet.WebDav\\Shiny.AspNet.WebDav.csproj",
+            "src\\Shiny.AspNet.WebHosting\\Shiny.AspNet.WebHosting.csproj",
+            "src\\Shiny.AspNet.Webhooks\\Shiny.AspNet.Webhooks.csproj"
         ]
     }
 }

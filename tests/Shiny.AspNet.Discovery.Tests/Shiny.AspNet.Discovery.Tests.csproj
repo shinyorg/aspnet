@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.Discovery\Shiny.AspNet.Discovery.csproj" />
+    </ItemGroup>
+</Project>

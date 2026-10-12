@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.AspNet.ContentDigest</RootNamespace>
+        <Description>RFC 9530 Content-Digest and Repr-Digest for ASP.NET Core - verifies request bodies end to end as they stream, and answers Want-Content-Digest with a header (small bodies) or a trailer (streamed ones). sha-256 and sha-512, trim- and AOT-clean.</Description>
+        <PackageTags>shiny aspnetcore content-digest repr-digest rfc9530 integrity digest</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.AspNet.ContentDigest.Tests"/>
+    </ItemGroup>
+</Project>

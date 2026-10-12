@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.WebDav\Shiny.AspNet.WebDav.csproj" />
+    </ItemGroup>
+</Project>

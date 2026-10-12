@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.FileSync\Shiny.AspNet.FileSync.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- The client is not ported: it has no server dependency, so the published one is what
+             proves the wire protocol survived the move to ASP.NET. -->
+        <PackageReference Include="Shiny.Net.HttpServer.FileSync.Client" />
+    </ItemGroup>
+</Project>
