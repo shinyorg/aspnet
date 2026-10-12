@@ -9,6 +9,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/shinyorg/aspnet</RepositoryUrl>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
     <!-- Enable trim/AOT analyzers on shipping library projects. Source generators (netstandard2.0) are excluded. -->
@@ -18,5 +19,6 @@
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 </Project>

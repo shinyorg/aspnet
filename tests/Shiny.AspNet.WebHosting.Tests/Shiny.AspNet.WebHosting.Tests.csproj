@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Shiny.AspNet.WebHosting\Shiny.AspNet.WebHosting.csproj" />
+    </ItemGroup>
+</Project>

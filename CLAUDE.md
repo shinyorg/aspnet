@@ -18,12 +18,38 @@ Guidance for Claude Code when working in this repository.
 - `skills/` — Claude Code skills shipped by this repo's plugin (`.claude-plugin/`)
 - `readme.md` — the NuGet/GitHub readme (also packed via `PackageReadmeFile`)
 
-## Build
+## Build & test
 
 ```bash
 dotnet build Build.slnf          # build the shipping set
 dotnet build AspNet.slnx         # build everything including samples
+dotnet test AspNet.slnx          # run all test projects
 ```
+
+Test projects live in `tests/Shiny.AspNet.<Name>.Tests` and pick up xunit.v3, Microsoft.Testing.Platform,
+`Microsoft.AspNetCore.TestHost` and the ASP.NET framework reference from `tests/Directory.Build.props` —
+a test csproj only needs its `ProjectReference`s and any extra packages.
+
+## Libraries ported from Shiny.Net.HttpServer
+
+Several libraries here are ports of add-ons from `~/Desktop/dev/httpserver` (`Shiny.Net.HttpServer.<Name>`),
+re-hosted on ASP.NET Core. They are forks, not shims: port idiomatically to ASP.NET rather than
+emulating the httpserver API.
+
+- **Naming**: package/project `Shiny.AspNet.<Name>`, namespace `Shiny.AspNet.<Name>` (`.Internal` for internals).
+- **HTTP surface**: `Microsoft.AspNetCore.Http.HttpContext`, `Task` instead of `ValueTask` for request
+  delegates, `IHeaderDictionary` indexers instead of `GetFirst`/`Set`, `HostString`, `IProblemDetailsService`
+  / `Results.Problem` for problem details.
+- **Registration**: `services.Add<Name>(...)` for DI/hosted services; `endpoints.Map<Name>(prefix, ...)` on
+  `IEndpointRouteBuilder` returning an `IEndpointConventionBuilder` (usually the `RouteGroupBuilder`), so
+  `RequireAuthorization`, `RequireCors`, `RequireRateLimiting`, `ExcludeFromDescription`, etc. come from
+  ASP.NET itself. Middleware is `app.Use<Name>()` / `IMiddleware`.
+- **Drop** httpserver-only plumbing: its own CORS / rate-limit / IP-filter wrappers, `HttpServer` lifecycle
+  attachment (use `IHostedService` or `IHostApplicationLifetime`), its OpenAPI types.
+- **AOT/trim clean**: shipping projects have `IsAotCompatible`; map with `RequestDelegate` overloads (not
+  inferred minimal-API lambdas), System.Text.Json source generation, no reflection.
+- **Tests**: port the matching upstream tests from `httpserver/tests/Shiny.Net.HttpServer.Tests/<Name>Tests.cs`
+  onto `TestServer` (or Kestrel on port 0 when a real client stack is required).
 
 ## Library ↔ docs ↔ skill map
 
