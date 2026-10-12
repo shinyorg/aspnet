@@ -18,30 +18,29 @@
         <File Path="Directory.Packages.props" />
         <File Path="readme.md" />
         <File Path="nuget.config" />
+        <File Path="src/Shared/LocalServerEndpoint.cs" />
     </Folder>
     <Folder Name="/samples/">
         <Project Path="samples/Sample.Aot/Sample.Aot.csproj" />
         <Project Path="samples/Sample.Web/Sample.Web.csproj" />
     </Folder>
-    <Folder Name="/src/">
-        <File Path="src/Shared/LocalServerEndpoint.cs" />
-        <Project Path="src/Shiny.AspNet.Acme/Shiny.AspNet.Acme.csproj" />
-        <Project Path="src/Shiny.AspNet.CalDav/Shiny.AspNet.CalDav.csproj" />
-        <Project Path="src/Shiny.AspNet.ContentDigest/Shiny.AspNet.ContentDigest.csproj" />
-        <Project Path="src/Shiny.AspNet.Discovery/Shiny.AspNet.Discovery.csproj" />
-        <Project Path="src/Shiny.AspNet.DocumentDb/Shiny.AspNet.DocumentDb.csproj" />
-        <Project Path="src/Shiny.AspNet.FileSync/Shiny.AspNet.FileSync.csproj" />
-        <Project Path="src/Shiny.AspNet.Idempotency/Shiny.AspNet.Idempotency.csproj" />
-        <Project Path="src/Shiny.AspNet.JsonPatch/Shiny.AspNet.JsonPatch.csproj" />
-        <Project Path="src/Shiny.AspNet.Npm/Shiny.AspNet.Npm.csproj" />
-        <Project Path="src/Shiny.AspNet.NuGet/Shiny.AspNet.NuGet.csproj" />
-        <Project Path="src/Shiny.AspNet.Ssh/Shiny.AspNet.Ssh.csproj" />
-        <Project Path="src/Shiny.AspNet.Tunnels/Shiny.AspNet.Tunnels.csproj" />
-        <Project Path="src/Shiny.AspNet.Tus/Shiny.AspNet.Tus.csproj" />
-        <Project Path="src/Shiny.AspNet.WebDav/Shiny.AspNet.WebDav.csproj" />
-        <Project Path="src/Shiny.AspNet.WebHosting/Shiny.AspNet.WebHosting.csproj" />
-        <Project Path="src/Shiny.AspNet.Webhooks/Shiny.AspNet.Webhooks.csproj" />
-    </Folder>
+    
+    <Project Path="src/Shiny.AspNet.Acme/Shiny.AspNet.Acme.csproj" />
+    <Project Path="src/Shiny.AspNet.CalDav/Shiny.AspNet.CalDav.csproj" />
+    <Project Path="src/Shiny.AspNet.ContentDigest/Shiny.AspNet.ContentDigest.csproj" />
+    <Project Path="src/Shiny.AspNet.Discovery/Shiny.AspNet.Discovery.csproj" />
+    <Project Path="src/Shiny.AspNet.DocumentDb/Shiny.AspNet.DocumentDb.csproj" />
+    <Project Path="src/Shiny.AspNet.FileSync/Shiny.AspNet.FileSync.csproj" />
+    <Project Path="src/Shiny.AspNet.Idempotency/Shiny.AspNet.Idempotency.csproj" />
+    <Project Path="src/Shiny.AspNet.JsonPatch/Shiny.AspNet.JsonPatch.csproj" />
+    <Project Path="src/Shiny.AspNet.Npm/Shiny.AspNet.Npm.csproj" />
+    <Project Path="src/Shiny.AspNet.NuGet/Shiny.AspNet.NuGet.csproj" />
+    <Project Path="src/Shiny.AspNet.Ssh/Shiny.AspNet.Ssh.csproj" />
+    <Project Path="src/Shiny.AspNet.Tunnels/Shiny.AspNet.Tunnels.csproj" />
+    <Project Path="src/Shiny.AspNet.Tus/Shiny.AspNet.Tus.csproj" />
+    <Project Path="src/Shiny.AspNet.WebDav/Shiny.AspNet.WebDav.csproj" />
+    <Project Path="src/Shiny.AspNet.WebHosting/Shiny.AspNet.WebHosting.csproj" />
+    <Project Path="src/Shiny.AspNet.Webhooks/Shiny.AspNet.Webhooks.csproj" />
     <Folder Name="/tests/">
         <File Path="tests/Directory.Build.props" />
         <Project Path="tests/Shiny.AspNet.Acme.Tests/Shiny.AspNet.Acme.Tests.csproj" />
