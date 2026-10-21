@@ -9,6 +9,7 @@
         <Authors>aritchie;ShinyLib</Authors>
         <Product>Shiny.AspNet</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) $([System.DateTime]::Now.Year) Allan Ritchie</Copyright>
         <RepositoryUrl>https://github.com/shinyorg/aspnet</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageIcon>icon.png</PackageIcon>
